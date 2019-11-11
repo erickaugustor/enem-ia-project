@@ -97,11 +97,11 @@ histNota_CH_LC_ESCOLA <- ggplot(data = enemDataset) +
 
 # Separando por tipo de escola
 
-histNota_CH_LC_ESCOLA <- ggplot(data = enemTipoEscola1) + 
+histNota_CH_LC_ESCOLA1 <- ggplot(data = enemTipoEscola1) + 
   geom_point(aes(x = NOTA_CH, y = NOTA_LC, col = TP_ESCOLA)) +
   ggtitle("Notas de Ciências Humanas e Linguagem e Comunicação em Escolas Públicas")
 
-histNota_CH_LC_ESCOLA <- ggplot(data = enemTipoEscola2) + 
+histNota_CH_LC_ESCOLA2 <- ggplot(data = enemTipoEscola2) + 
   geom_point(aes(x = NOTA_CH, y = NOTA_LC, col = TP_ESCOLA)) +
   ggtitle("Notas de Ciências Humanas e Linguagem e Comunicação em Escolas Privadas")
 
