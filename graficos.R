@@ -8,14 +8,13 @@ library(dplyr)
 
 #####################################################################
 # Local file
-
 getwd()
 location <- getwd()
 setwd(location)
 
 #####################################################################
 
-enemDataset2014 <- read.csv("enem-2014.csv", nrows=100000, header=TRUE, sep=",")
+enemDataset2014 <- read.csv("enem-2014.csv", nrows=500000, header=TRUE, sep=",")
 
 str(enemDataset2014)
 
@@ -65,6 +64,25 @@ str(enemDataset)
 
 #####################################################################
 
+# Criando um Range para as notas de redação
+
+enemDataset$R_NOTA_REDACAO <- cut(enemDataset$NU_NOTA_REDACAO,
+                                  c(-1, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000),
+                                  labels=c("0-500", "500-550", "550-600", "600-650",
+                                           "650-700", "700-750", "750-800", "800-850",
+                                           "850-900", "900-950", "950-1000"))
+
+#####################################################################
+
+# Removendo notas zeradas nas provas
+
+enemDataset <- enemDataset[!(enemDataset$NOTA_LC==0),]
+enemDataset <- enemDataset[!(enemDataset$NOTA_CH==0),]
+enemDataset <- enemDataset[!(enemDataset$NOTA_MT==0),]
+enemDataset <- enemDataset[!(enemDataset$NOTA_CN==0),]
+
+#####################################################################
+
 tipoEscola <- data.frame(table(enemDataset$TP_ESCOLA))
 
 histTipoEscola <- ggplot(tipoEscola, aes(x = Var1, y = Freq)) +
@@ -84,6 +102,9 @@ histTipoEscola <- ggplot(tipoEscola, aes(x = Var1, y = Freq)) +
 #####################################################################
 
 enemExtremoFaixaFamiliar <- filter(enemDataset, as.character(RENDA_FAMILIAR) %in% c("B", "Q"))
+
+enemExtremoFaixaQ <- filter(enemDataset, as.character(RENDA_FAMILIAR) %in% c("Q"))
+enemExtremoFaixaB <- filter(enemDataset, as.character(RENDA_FAMILIAR) %in% c("B"))
 
 enemTipoEscola1 <- filter(enemDataset, TP_ESCOLA == 1)
 enemTipoEscola2 <- filter(enemDataset, TP_ESCOLA == 2)
@@ -107,6 +128,8 @@ histNota_CH_LC_ESCOLA2 <- ggplot(data = enemTipoEscola2) +
 
 #####
 
+# Separando port tipo de Renda Familiar:
+
 histNota_CH_LC_RENDA_FAMILIAR <- ggplot(data = enemDataset) + 
   geom_point(aes(x = NOTA_CH, y = NOTA_LC, col = RENDA_FAMILIAR)) +
   ggtitle("Notas de Ciências Humanas e Linguagem e Comunicação por Renda Familiar")
@@ -115,6 +138,19 @@ histNota_CH_LC_RENDA_FAMILIAR_EXTREMO <- ggplot(data = enemExtremoFaixaFamiliar)
   geom_point(aes(x = NOTA_CH, y = NOTA_LC, col = RENDA_FAMILIAR)) +
   ggtitle("Notas de Ciências Humanas e Linguagem e Comunicação por Renda Familiar - Extremos")
 
+#####
+
+histNota_CH_LC_RENDA_FAMILIAR_EXTREMO_Q <- ggplot(data = enemExtremoFaixaQ) + 
+  geom_point(aes(x = NOTA_CH, y = NOTA_LC, col = RENDA_FAMILIAR)) +
+  ggtitle("Notas de Ciências Humanas e Linguagem e Comunicação por Renda Familiar - Q")
+
+histNota_CH_LC_RENDA_FAMILIAR_EXTREMO_B <- ggplot(data = enemExtremoFaixaB) + 
+  geom_point(aes(x = NOTA_CH, y = NOTA_LC, col = RENDA_FAMILIAR)) +
+  ggtitle("Notas de Ciências Humanas e Linguagem e Comunicação por Renda Familiar - B")
+
+#####################################################################
+#####################################################################
+#####################################################################
 #####################################################################
 
 histNota_MT_CN_ESCOLA <- ggplot(data = enemDataset) + 
@@ -124,12 +160,19 @@ histNota_MT_CN_ESCOLA <- ggplot(data = enemDataset) +
 
 # Separando por tipo de escola
 
-# TODO: ESCOLA 1
+histNota_MT_CN_ESCOLA1 <- ggplot(data = enemTipoEscola1) + 
+  geom_point(aes(x = NOTA_MT, y = NOTA_CN, col = TP_ESCOLA)) +
+  ggtitle("Notas de Ciências da Natureza e Matemática em Escolas Públicas")
 
-# TODO: ESCOLA 2
+histNota_MT_CN_ESCOLA2 <- ggplot(data = enemTipoEscola2) + 
+  geom_point(aes(x = NOTA_MT, y = NOTA_CN, col = TP_ESCOLA)) +
+  ggtitle("Notas de Ciências da Natureza e Matemática em Escolas Privadas")
+
 
 
 ####
+
+# Separando port tipo de Renda Familiar:
 
 histNota_MT_CN_RENDA_FAMILIAR <- ggplot(data = enemDataset) + 
   geom_point(aes(x = NOTA_MT, y = NOTA_CN, col = RENDA_FAMILIAR)) +
@@ -139,19 +182,36 @@ histNota_MT_CN_RENDA_FAMILIAR_EXTREMO <- ggplot(data = enemExtremoFaixaFamiliar)
   geom_point(aes(x = NOTA_MT, y = NOTA_CN, col = RENDA_FAMILIAR)) +
   ggtitle("Notas de Ciências da Natureza e Matemática por Renda Familiar - Extremo")
 
+
+#####
+
+histNota_MT_CN_RENDA_FAMILIAR_EXTREMO_Q <- ggplot(data = enemExtremoFaixaQ) + 
+  geom_point(aes(x = NOTA_MT, y = NOTA_CN, col = RENDA_FAMILIAR)) +
+  ggtitle("Notas de Ciências da Natureza e Matemática por Renda Familiar - Q")
+
+histNota_MT_CN_RENDA_FAMILIAR_EXTREMO_B <- ggplot(data = enemExtremoFaixaB) + 
+  geom_point(aes(x = NOTA_MT, y = NOTA_CN, col = RENDA_FAMILIAR)) +
+  ggtitle("Notas de Ciências da Natureza e Matemática por Renda Familiar - B")
+
+
+#####################################################################
+#####################################################################
+#####################################################################
+#####################################################################
 #####################################################################
 
-# Misturando Ciências da Natureza e Ciências Humanas
+# Comparando Ciências da Natureza e Ciências Humanas
 
 histNota_CH_CN_ESCOLA <- ggplot(data = enemDataset) + 
   geom_point(aes(x = NOTA_CH, y = NOTA_CN, col = TP_ESCOLA)) +
   ggtitle("Notas de Ciências Humanas e Ciências da Natureza por Tipo de Escola")
 
 
-# Misturando Matemática e Português
+# Comparando Matemática e Português
 
-# TODO: Relação de Matematica e Português
-
+histNota_CH_CN_ESCOLA <- ggplot(data = enemDataset) + 
+  geom_point(aes(x = NOTA_LC, y = NOTA_MT, col = TP_ESCOLA)) +
+  ggtitle("Notas de Linguagem e Comunicação e Matemática por Tipo de Escola")
 
 #####################################################################
 
@@ -174,30 +234,52 @@ lineREDACAO <- ggplot(enemDataset, aes(NU_NOTA_REDACAO)) +
 
 #####################################################################
 
-maioresNotasRedacao <- subset(enemDataset, NU_NOTA_REDACAO > 700)
-
-histMaioresNotasREDACAO <- ggplot(maioresNotasRedacao, aes(NU_NOTA_REDACAO)) +
+histREDACAO_R <- ggplot(enemDataset, aes(R_NOTA_REDACAO)) +
   geom_histogram(
     aes(color = TP_ESCOLA, fill = TP_ESCOLA),
     alpha=0.4,
-    bins = 30,
     position="identity",
+    stat="count",
   ) +
   scale_fill_manual(values = c("#00AFBB", "#E7B800")) +
   scale_color_manual(values = c("#00AFBB", "#E7B800"))
 
 #####################################################################
 
-menoresNotasREDACAO <- subset(enemDataset, NU_NOTA_REDACAO < 600)
+enemDatasetBackup <- enemDataset
 
-histMenoresNotasREDACAO <- ggplot(menoresNotasREDACAO, aes(NU_NOTA_REDACAO)) +
+enemDataset <- enemDataset[!(enemDataset$R_NOTA_REDACAO=="0-500"),]
+
+histREDACAO_R__ALTO <- ggplot(enemDataset, aes(R_NOTA_REDACAO)) +
   geom_histogram(
     aes(color = TP_ESCOLA, fill = TP_ESCOLA),
     alpha=0.4,
-    bins = 30,
     position="identity",
+    stat="count",
   ) +
   scale_fill_manual(values = c("#00AFBB", "#E7B800")) +
   scale_color_manual(values = c("#00AFBB", "#E7B800"))
+
+enemDataset <- enemDatasetBackup
+
+#####################################################################
+
+enemDatasetBackup <- enemDataset
+
+enemDataset <- enemDataset[(enemDataset$R_NOTA_REDACAO=="950-1000" |
+                              enemDataset$R_NOTA_REDACAO=="900-950" |
+                              enemDataset$R_NOTA_REDACAO=="850-900"),]
+
+histREDACAO_R_ALTO <- ggplot(enemDataset, aes(R_NOTA_REDACAO)) +
+  geom_histogram(
+    aes(color = TP_ESCOLA, fill = TP_ESCOLA),
+    alpha=0.4,
+    position="identity",
+    stat="count",
+  ) +
+  scale_fill_manual(values = c("#00AFBB", "#E7B800")) +
+  scale_color_manual(values = c("#00AFBB", "#E7B800"))
+
+enemDataset <- enemDatasetBackup
 
 #####################################################################
